@@ -26,6 +26,9 @@ body {
     line-height:2vw;
     margin-right:20px;
 }
+#goUp:hover {
+    box-shadow:inset 0px 0px 7px 0px rgba(0,0,0,0.75);
+}
 
 #fullTitle {
     float:left;
