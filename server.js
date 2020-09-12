@@ -37,7 +37,14 @@ io.on("connection",function(client) {
     client.on("downloadFile",function(data) {
         const file = dir+"\\"+data.file;
         console.log(res);
-    })
+    });
+
+    client.on("getFile",function(data) {
+        fs.readFile(dir+"\\"+data.name,"utf8",function(error,data) {
+            if(error) throw error;
+            io.to(client.id).emit("fileGotten",{contents:data});
+        });
+    });
 
     function getDirectory(DIR) {
         var fls = [], folders = [];

@@ -13,6 +13,7 @@
                 <img src = "/images/file.png" alt = "An image file">
                 <span class = "title"></span>
                 <button title = "Download">📥</button>
+                <button title = "Preview File">👁</button>
             </div>
         </template>
         <template id = "folder">
@@ -21,14 +22,20 @@
                 <span class = "title"></span>
             </div>
         </template>
-        <div id = "fileViewer">
+        <div id = "fileTree">
             <div id = "header">
                 <button id = "goUp" title = "Go Up Directory">⮌</button>
-                <span id = "fullTitle">Current Folder: <span id = "folderName">protestantFileTransfer</span></span>
+                <span id = "fullTitle">Current Folder: <span id = "folderName"></span></span>
             </div>
             <div id = "files">
-
             </div>
+        </div>
+        <div id = "fileViewer" class = "hide">
+            <div id = "fileTitleHeader">
+                <div id = "fileTitle"></div>
+                <button id = "close">🗙</button>
+            </div>
+            <pre></pre>
         </div>
         <script src = "http://localhost:35729/livereload.js"></script>
     </body

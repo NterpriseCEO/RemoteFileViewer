@@ -20,6 +20,12 @@ document.onreadystatechange = function() {
         .addEventListener("click",function() {
             goUp();
         });
+
+        document.getElementById("close")
+        .addEventListener("click",function() {
+            document.getElementById("fileViewer").classList.add("hide");
+            document.getElementById("fileTree").classList.remove("noScroll");
+        });
     }
 }
 
@@ -40,7 +46,7 @@ function getDirectory() {
             folderTitle.innerText = item;
             let elm = folderClone.cloneNode(true);
             filesBox.append(elm);
-            elm.addEventListener("click",function() {
+            elm.addEventListener("dblclick",function() {
                 socket.emit(socket.emit("getDirectory",{dir:elm.querySelector(".title").textContent}));
             })
         });
@@ -48,9 +54,27 @@ function getDirectory() {
             title.innerText = item;
             let elm = clone.cloneNode(true);
             filesBox.append(elm);
-            elm.querySelector("button").addEventListener("click",function() {
+            elm.querySelectorAll("button")[0].addEventListener("click",function() {
                 window.open("/?file="+elm.querySelector(".title").textContent);
+            });
+            elm.querySelectorAll("button")[1].addEventListener("click",function() {
+                loadFile(elm);
+            });
+            elm.addEventListener("dblclick",function() {
+                loadFile(elm);
             });
         });
     });
+
+    function loadFile(elm) {
+        document.getElementsByTagName("pre")[0].innerText = "";
+        document.getElementById("fileTitle").innerText = elm.querySelector(".title").textContent;
+        document.getElementById("fileViewer").classList.remove("hide");
+        document.getElementById("fileTree").classList.add("noScroll");
+        socket.emit("getFile",{name:elm.querySelector(".title").textContent});
+        socket.once("fileGotten",function(data) {
+            document.getElementsByTagName("pre")[0].innerText = data.contents;
+            console.log(data.contents);
+        });
+    }
 }
