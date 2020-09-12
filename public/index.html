@@ -1,11 +1,35 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io-stream/0.9.1/socket.io-stream.min.js"></script>
         <script src = "js/index.js"></script>
+        <link rel = "stylesheet" href = "css/index.css">
         <title>PFP - Protestant File Protocol</title>
     </head>
     <body>
-        <input id = "selectFiles" type = "file">
+        <template id = "file">
+            <div class = "file">
+                <img src = "/images/file.png" alt = "An image file">
+                <span class = "title"></span>
+                <button title = "Download">📥</button>
+            </div>
+        </template>
+        <template id = "folder">
+            <div class = "folder">
+                <img src = "/images/folder.png" alt = "An image file">
+                <span class = "title"></span>
+            </div>
+        </template>
+        <div id = "fileViewer">
+            <div id = "header">
+                <button id = "goUp" title = "Go Up Directory">⮌</button>
+                <span id = "fullTitle">Current Folder: <span id = "folderName">protestantFileTransfer</span></span>
+            </div>
+            <div id = "files">
+
+            </div>
+        </div>
         <script src = "http://localhost:35729/livereload.js"></script>
     </body
 </html>
