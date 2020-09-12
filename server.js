@@ -24,6 +24,7 @@ io.on("connection",function(client) {
     client.on("goUp",function() {
         if(dir.substring(0, dir.lastIndexOf('\\')) != "") {
             dir = dir.substring(0, dir.lastIndexOf('\\'));
+            dir = dir === "C:" ? "C:\\" : dir;
             getDirectory(dir);
         }
     });
@@ -32,11 +33,6 @@ io.on("connection",function(client) {
         let dd = data != undefined ? dir+"\\"+data.dir : __dirname;
 
         getDirectory(dd);
-    });
-
-    client.on("downloadFile",function(data) {
-        const file = dir+"\\"+data.file;
-        console.log(res);
     });
 
     client.on("getFile",function(data) {
@@ -69,6 +65,12 @@ io.on("connection",function(client) {
                             fls[f++] = file;
                         }
                         if(num == files.length) {
+                            folders.sort(function (a, b) {
+                                return a.toLowerCase().localeCompare(b.toLowerCase());
+                            });
+                            fls.sort(function (a, b) {
+                                return a.toLowerCase().localeCompare(b.toLowerCase());
+                            });
                             dir = DIR;
                             io.to(client.id).emit("folderContents",{files:fls,folders:folders,dir:DIR});
                         }
