@@ -2,25 +2,40 @@ let express = require("express"),
     app = express(),
     path = require("path"),
     fs = require("fs"),
+    ss = require("socket.io-stream"),
     dir = __dirname,
     res;
 
 let code;
 app.use(express.static(__dirname));
-app.get("/", function(req,res) {
-    if(Object.keys(req.query).length !== 0) {
-        res.download(dir+"/"+req.query.file);
-    }else {
-        res.redirect("/public");
-    }
-});
 let server = app.listen(process.env.PORT|| 8080,function() {
     console.log("Server is running");
 });
 
-let io = require("socket.io").listen(server)
+let io = require("socket.io").listen(server);
 
 io.on("connection",function(client) {
+    //let randomNum = (Math.floor(Math.random()*90000) + 10000).toString();
+    client.join("theroom");
+
+    app.get("/", function(req,res) {
+        console.log(req.query);
+        if(Object.keys(req.query).length !== 0) {
+            let files = req.query.file.split(",");
+            res.download(dir+"\\"+files[0],function(error) {
+                if(error) {
+                    socket.emit("fileError",error);
+                }
+                if(files.length > 1) {
+                    files.shift();
+                    io.to("theroom").emit("filesToDownload",{files:files});
+                }
+            });
+        }else {
+            res.redirect("/public");
+        }
+    });
+
     client.on("goUp",function() {
         if(dir.substring(0, dir.lastIndexOf('\\')) != "") {
             dir = dir.substring(0, dir.lastIndexOf('\\'));
@@ -36,11 +51,29 @@ io.on("connection",function(client) {
     });
 
     client.on("getFile",function(data) {
-        fs.readFile(dir+"\\"+data.name,"utf8",function(error,data) {
-            if(error) throw error;
-            io.to(client.id).emit("fileGotten",{contents:data});
-        });
+        let lowerName = data.name.toLowerCase();
+        console.log(lowerName);
+        if(lowerName.endsWith(".png") || lowerName.endsWith(".jpg") || lowerName.endsWith(".gif") || lowerName.endsWith(".webm")) {
+            io.to(client.id).emit("fileGotten",{contents:base64_encode(dir+"\\"+data.name),type:"image"})
+        }else {
+            fs.readFile(dir+"\\"+data.name,"utf8",function(error,data2) {
+                if(error) throw error;
+                io.to(client.id).emit("fileGotten",{contents:data2});
+            });
+        }
     });
+
+    client.on('getAudio', function (data) {
+        var stream = ss.createStream();
+        let file = dir+"\\"+data.name;
+        ss(client).emit('audioStream', stream, {name:file});
+        fs.createReadStream(file).pipe(stream);
+    });
+
+    // function to encode file data to base64 encoded string
+    function base64_encode(file) {
+        return "data:image/*;base64,"+fs.readFileSync(file, { encoding: 'base64' });
+    }
 
     function getDirectory(DIR) {
         var fls = [], folders = [];

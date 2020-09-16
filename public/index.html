@@ -3,7 +3,7 @@
     <head>
         <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
         <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io-stream/0.9.1/socket.io-stream.min.js"></script>
-        <script src = "js/index.js"></script>
+        <script src = "js/index.js" type = "module"></script>
         <link rel = "stylesheet" href = "css/index.css">
         <title>PFP - Protestant File Protocol</title>
     </head>
@@ -26,6 +26,7 @@
             <div id = "header">
                 <button id = "goUp" title = "Go Up Directory">⮌</button>
                 <span id = "fullTitle">Current Folder: <span id = "folderName"></span></span>
+                <button id = "downloadSelected" class = "hide">Download Selected</button>
             </div>
             <div id = "files">
             </div>
@@ -35,7 +36,14 @@
                 <div id = "fileTitle"></div>
                 <button id = "close">🗙</button>
             </div>
-            <pre></pre>
+            <pre class = "preview"></pre>
+            <img id = "previewImage" class = "preview hide">
+            <div id = "audio" class = "preview hide">
+                <div id = "audioControls">
+                    <button id = "playPause">||</button>
+                </div>
+                <audio controls class = "hide"></audio>
+            </div>
         </div>
         <script src = "http://localhost:35729/livereload.js"></script>
     </body
