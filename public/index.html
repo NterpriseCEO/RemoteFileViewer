@@ -1,50 +1,242 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/styles/a11y-dark.min.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.1.0/highlight.min.js"></script>
         <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
         <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io-stream/0.9.1/socket.io-stream.min.js"></script>
         <script src = "js/index.js" type = "module"></script>
-        <link rel = "stylesheet" href = "css/index.css">
+        <link href="css/tailwind.css" rel="stylesheet">
         <title>PFP - Protestant File Protocol</title>
     </head>
-    <body>
+    <body class = "bg-gray-800 select-none">
         <template id = "file">
-            <div class = "file">
-                <img src = "/images/file.png" alt = "An image file">
-                <span class = "title"></span>
-                <button title = "Download">📥</button>
-                <button title = "Preview File">👁</button>
+            <div class = "file flex items-center p-5 hover:bg-gray-900 hover:shadow-xl cursor-pointer">
+                <svg class = "flex-none h-10 text-red-500 shadow-xl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span class = "title px-5 text-gray-400 flex-grow max-w-md"></span>
+                <button title = "Download" class = "flex-none w-10">
+                    <svg class = "w-7 text-gray-500 hover:text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                </button>
+                <button title = "Preview File" class = "flex-none w-10">
+                    <svg class = "w-7 text-gray-500 hover:text-red-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                </button>
             </div>
         </template>
         <template id = "folder">
-            <div class = "folder">
-                <img src = "/images/folder.png" alt = "An image file">
-                <span class = "title"></span>
+            <div class = "folder flex items-center p-5 hover:bg-gray-900 hover:shadow-xl cursor-pointer">
+                <svg class = "w-10 text-yellow-500 shadow-xl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+                <!-- <img src = "/images/folder.png" class = "w-12" alt = "An image file"> -->
+                <span class = "title px-5 text-gray-400"></span>
             </div>
         </template>
-        <div id = "fileTree">
-            <div id = "header">
-                <button id = "goUp" title = "Go Up Directory">⮌</button>
-                <span id = "fullTitle">Current Folder: <span id = "folderName"></span></span>
-                <button id = "downloadSelected" class = "hide">Download Selected</button>
+        <div class = "flex flex-row">
+            <div id = "sidebar" class = "flex-none w-1/12 bg-gray-900">
             </div>
-            <div id = "files">
+            <div class = "w-10 flex items-center">
+                <button id = "hideSidebar" class = "text-center text-white bg-gray-900 rounded-r-full h-20 w-10">></button>
+            </div>
+            <div id = "fileTree" class = "w-auto h-screen flex flex-col flex-auto">
+                <div id = "header" class = "bg-gray-900 shadow-xl flex">
+                    <button id = "historyBack" class = "bg-red-500 px-5 text-white shadow-md hover:shadow-xl hover:bg-red-600" title = "Backwards">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    <button id = "historyForwards" class = "bg-red-500 px-5 text-white shadow-md hover:shadow-xl hover:bg-red-600" title = "Backwards">
+                    <!-- <button id = "historyForwards" class = "bg-red-700 px-5 text-gray-400 shadow-md cursor-default" title = "Forwards"> -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                    <button id = "goUp" class = "bg-red-500 px-5 text-white shadow-md hover:shadow-xl hover:bg-red-600" title = "Go Up Directory">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                        </svg>
+                    </button>
+                    <button id = "downloadSelected" class = "bg-green-800 px-5 text-white shadow-md hover:shadow-xl hover:bg-green-600" disabled>Download Selected</button>
+                    <button id = "sortItems" class = "bg-red-500 px-5 text-white shadow-md hover:shadow-xl hover:bg-red-600" title = "Sort files and folders">A-Z</button>
+                    <span class = "text-white flex flex-col justify-center items-center relative -right-7">
+                        <span class = "align-middle">C:\</span>
+                    </span>
+                    <div class = "py-2 text-gray-400 flex-grow">
+                        <input id = "folderName" class = "w-full h-10 p-2 bg-gray-800 text-white px-8">
+                    </div>
+                    <div class = "py-2">
+                        <button id = "goToDirectory" class = "bg-red-500 px-3 h-full text-white shadow-md hover:shadow-xl hover:bg-red-600" title = "Go To Directory">
+                            <!-- <button id = "historyForwards" class = "bg-red-700 px-5 text-gray-400 shadow-md cursor-default" title = "Forwards"> -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class = "w-56 py-2 pl-2 text-gray-400 flex-none">
+                        <input id = "search" class = "w-full h-10 p-2 bg-gray-800 text-white" placeholder = "🔍 Search">
+                    </div>
+                    <div class = "py-2 pr-2">
+                        <button id = "search" class = "bg-red-500 px-3 h-full text-white shadow-md hover:shadow-xl hover:bg-red-600" title = "Go To Directory">
+                            <!-- <button id = "historyForwards" class = "bg-red-700 px-5 text-gray-400 shadow-md cursor-default" title = "Forwards"> -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class = "flex-grow overflow-auto">
+                    <div id = "files" class = "flex flex-col">
+                        <div id = "emptyFolder" class = "hidden flex justify-center mt-10">
+                            <div class = "flex-none bg-gray-900 p-5 text-white rounded-xl shadow-xl">
+                                This folder is empty!
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div id = "fileViewer" class = "hide">
-            <div id = "fileTitleHeader">
-                <div id = "fileTitle"></div>
-                <button id = "close">🗙</button>
-            </div>
-            <pre class = "preview"></pre>
-            <img id = "previewImage" class = "preview hide">
-            <div id = "audio" class = "preview hide">
-                <div id = "audioControls">
-                    <button id = "playPause">||</button>
+        <div id = "fileViewerWrapper" class = "hidden fixed flex items-center justify-around h-full w-full inset-0 bg-black bg-opacity-70">
+            <button id = "previousFile" class = "text-white p-5 rounded-full bg-red-500 hover:bg-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <div id = "fileViewer" class = "flex flex-col w-3/4 h-5/6 shadow-2xl rounded-xl bg-gray-900 overflow-hidden">
+                <div class = "flex flex-initial border-b-2 border-gray-700">
+                    <div class = "flex-grow text-white text-center text-xl">
+                        <div id = "fileTitle" class = "m-4"></div>
+                    </div>
+                    <button id = "close" class = "bg-gray-700 rounded-tr-xl hover:shadow-xl hover:bg-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 m-3 mx-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-                <audio controls class = "hide"></audio>
+                <pre class = "preview flex-auto overflow-auto p-5 text-gray-400"></pre>
+                <img id = "previewImage" class = "preview hidden overflow-hidden flex-grow object-contain">
+                <div id = "audioWrap" class = "preview hidden flex-auto">
+                    <div class = "flex flex-col h-full">
+                        <audio></audio>
+                        <div class = "flex-auto w-full">
+                            <canvas id = "musicVisual" class = "w-full h-full"></canvas>
+                        </div>
+                        <div id = "audioControls" class = "w-full h-30 flex-initial bg-gray-800 transition-all duration-500">
+                            <div class = "w-full flex justify-center items-center">
+                                <span id = "audioCurrentTime" class = "mr-5  mt-2 text-white flex-none">00:00:00</span>
+                                <div id = "audioTimeWrap" class="overflow-hidden mt-2 w-9/12 h-2 text-xs flex rounded bg-red-200">
+                                    <div id = "audioTime" class=" bg-red-500"></div>
+                                </div>
+                                <span id = "audioFullTime" class = "ml-5 mt-2 text-white flex-none">00:00:00</span>
+                            </div>
+                            <div class = "w-full grid justify-items-center place-content-center grid-flow-col mb-2">
+                                <button id = "downloadAudio">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button id = "rewindAudio" class = "mx-5">
+                                    <svg xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox = "0 0 20 20" fill = "currentColor">
+                                        <path d = "M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+                                    </svg>
+                                </button>
+                                <div class = "relative bg-gray-800">
+                                    <div id = "audioVolumeWrap" class="inline overflow-hidden w-1/4 h-2 rounded bg-red-200 absolute bottom-1/2 -right-1/4 hidden">
+                                        <div id = "audioVolumeInner" class="bg-red-500 h-2" style = "width: 100%;"></div>
+                                    </div>
+                                    <button id = "playPauseAudio" class = "mx-5">
+                                        <svg id = "playAudioIcon" xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white hidden" viewBox = "0 0 20 20" fill = "currentColor">
+                                            <path fill-rule = "evenodd" d = "M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule = "evenodd" />
+                                        </svg>
+                                        <svg id = "pauseAudioIcon" xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox = "0 0 20 20" fill = "currentColor">
+                                            <path fill-rule = "evenodd" d = "M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule = "evenodd" />
+                                        </svg>
+                                    </button>
+                                    <button id = "fastForwardAudio" class = "mx-5">
+                                        <svg xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox = "0 0 20 20" fill = "currentColor">
+                                            <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
+                                        </svg>
+                                    </button>
+                                    <button id = "audioVolume" class = "mx-5">
+                                        <svg id = "unmutedAudio" xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                                        </svg>
+                                        <svg id = "mutedAudio" xmlns="http://www.w3.org/2000/svg" class = "w-14 h-14 text-white hidden" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id = "videoWrap" class = "preview hidden flex-grow relative">
+                    <video class = "absolute h-full w-full"></video>
+                    <div id = "videoControls" class = "absolute w-full bottom-0 pt-2 bg-gray-800 transition-all duration-500">
+                        <div class = "w-full flex justify-center items-center">
+                            <span id = "currentTime" class = "mr-5 text-white flex-none">00:00:00</span>
+                            <div id = "videoTimeWrap" class="overflow-hidden w-9/12 h-2 text-xs flex rounded bg-red-200">
+                                <div id = "videoTime" class=" bg-red-500"></div>
+                            </div>
+                            <span id = "fullTime" class = "ml-5 text-white flex-none">00:00:00</span>
+                        </div>
+                        <div class = "w-full grid py-2 justify-items-center place-content-center grid-flow-col">
+                            <button id = "downloadVideo">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-14 h-14 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M2 9.5A3.5 3.5 0 005.5 13H9v2.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 15.586V13h2.5a4.5 4.5 0 10-.616-8.958 4.002 4.002 0 10-7.753 1.977A3.5 3.5 0 002 9.5zm9 3.5H9V8a1 1 0 012 0v5z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <button id = "rewind" class = "mx-5">
+                                <svg xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox = "0 0 20 20" fill = "currentColor">
+                                    <path d = "M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z" />
+                                </svg>
+                            </button>
+                            <div class = "relative bg-gray-800">
+                                <div id = "videoVolumeWrap" class="inline overflow-hidden w-1/4 h-2 rounded bg-red-200 absolute bottom-1/2 -right-1/4 hidden">
+                                    <div id = "videoVolume" class="bg-red-500 h-2" style = "width: 100%;"></div>
+                                </div>
+                                <button id = "playPause" class = "mx-5">
+                                    <svg id = "playIcon" xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white hidden" viewBox = "0 0 20 20" fill = "currentColor">
+                                        <path fill-rule = "evenodd" d = "M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule = "evenodd" />
+                                    </svg>
+                                    <svg id = "pauseIcon" xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox = "0 0 20 20" fill = "currentColor">
+                                        <path fill-rule = "evenodd" d = "M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule = "evenodd" />
+                                    </svg>
+                                </button>
+                                <button id = "fastForward" class = "mx-5">
+                                    <svg xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox = "0 0 20 20" fill = "currentColor">
+                                        <path d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z" />
+                                    </svg>
+                                </button>
+                                <button id = "volume" class = "mx-5">
+                                    <svg id = "unmuted" xmlns = "http://www.w3.org/2000/svg" class = "w-14 h-14 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                                    </svg>
+                                    <svg id = "muted" xmlns="http://www.w3.org/2000/svg" class = "w-14 h-14 text-white hidden" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <button id = "nextFile" class = "text-white p-5 rounded-full bg-red-500 hover:bg-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
         </div>
         <script src = "http://localhost:35729/livereload.js"></script>
-    </body
+    </body>
 </html>
+
+<!--
+    Project idea: remove cmd control
+-->

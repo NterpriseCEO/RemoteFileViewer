@@ -1,48 +1,178 @@
-import { socket, isShifting, setIsShifting, selectedFiles, setSelectedFiles } from "./globals.js"
-import { getDirectory, init } from "./getDirectory.js"
-import { audioPlayer } from "./audio.js"
+import { socket, isShifting, setIsShifting, selectedFiles, setSelectedFiles, lastDirectory, setLastDirectory, History, addToHistory,
+         historyPos, setHistoryPos, files, folders} from "./globals.js"
+import { getDirectory, init, showItems } from "./getDirectory.js"
+import "./fileViewer/fileViewer.js"
+import "./sidebar.js";
 
-let downloadSelected;
+let downloadSelected,
+    folderName,
+    backButton,
+    forwardsButton,
+    sortButton;
 
-document.onreadystatechange = function() {
+document.onreadystatechange = async function() {
     if (document.readyState == "complete") {
+
+        //The file path gotten via query strings
+        const params = new URLSearchParams(window.location.search);
+        let directory = params.get("directory");
+
+        backButton = document.getElementById("historyBack");
+        forwardsButton = document.getElementById("historyForwards");
+
+        //The button for sorting A-Z and Z-A
+        sortButton = document.getElementById("sortItems");
+
+        //The download button for downloading all selected files
         downloadSelected = document.getElementById("downloadSelected");
+        //The input that shows the folder path
+        folderName = document.getElementById("folderName");
 
+        //Initialised everything
         init();
-        audioPlayer();
-        getDirectory();
 
+        //CHecks if the user passed a folder path via the directory query string
+        if(directory !== null) {
+            directory = directory.replace("%20", "").replace(/\\$/, "");
+            directory = directory.replace("%20", "");
+            getDirectory(directory, true).then(exists => {
+                //Displays the default directory if the directory does not exist
+                //Adds the directory to the history
+                addToHistory(directory);
+            }, enoent => {
+                alert("This folder does not exist! Showing the default directory");
+                getDirectory().then(exists => {
+                    //Checks if the directory exists and then displays / adds it to history
+                    console.log("hello");
+                    addToHistory(folderName.value);
+                }, enoent2 => {
+                    console.log("testing");
+                });
+            });
+        }else {
+            //Checks if there is a previously viewed folder in local storage
+            let dir = localStorage.getItem("directory");
+            if(dir !== "undefined" && dir !== null) {
+                //Tries to load the directory in storage and alerts the user if it doesn't exist
+                console.log("hello");
+                getDirectory(dir, true).then(exists => {
+                }, enoent => {
+                    alert("This folder does not exist! Showing the default directory");
+                    getDirectory().then(exists => {
+                        console.log("hello");
+                        addToHistory(dir);
+                    });
+                });
+            }else {
+                //If all else fails, show default directory
+                getDirectory().then(exists => {
+                    addToHistory(folderName.value);
+                });
+            }
+        }
+
+        backButton.addEventListener("click", () => {
+            console.log(historyPos, History.length-2);
+            //Check that the user is not at the start of the history
+            if(historyPos > 0) {
+                //Displays the previous directory in history
+                getDirectory(History[historyPos-2]);
+                //Sets the position of the history variable
+                setHistoryPos(historyPos-1);
+            }
+        });
+        forwardsButton.addEventListener("click", () => {
+            console.log(historyPos, History.length-1);
+            //Checks if the user is not at the end the history
+            if(historyPos < History.length) {
+                //Displays the next directory in the history
+                getDirectory(History[historyPos]);
+                //Sets the position of the history variable
+                setHistoryPos(historyPos+1);
+            }
+        });
+
+        //Request and display the parent directory of the current folder
         document.getElementById("goUp")
         .addEventListener("click",function() {
+            //Unselects all selected files
             setSelectedFiles([]);
-            downloadSelected.classList.add("hide");
-            socket.emit("goUp");
+            downloadSelected.classList.remove("bg-green-500");
+            downloadSelected.classList.add("bg-green-800");
+            downloadSelected.disabled = true;
+
+            window.dispatchEvent(new Event("resetLastFile"));
+            //Removes everything after the last backslash
+            getDirectory(folderName.value.substr(0, folderName.value.lastIndexOf("\\"))).then(exits => {
+                addToHistory(folderName.value);
+                console.log(History);
+            });
         });
 
-        document.getElementById("close")
-        .addEventListener("click",function() {
-            document.getElementById("fileViewer").classList.add("hide");
-            document.getElementById("fileTree").classList.remove("noScroll");
+        //Goes to the directory in the search bar if it exists
+        document.getElementById("goToDirectory").addEventListener("click", function() {
+            folderName.value = folderName.value.replace("/", "\\");
+            getDirectory(document.getElementById("folderName").value).then(exists => {
+                addToHistory(folderName.value);
+            }, enoent => {
+                alert("This folder does not exist!!!");
+            });
+        });
+        //Checks if the user presses enter in the searchbar and goes to the directory if it exists
+        folderName.addEventListener("keyup", function(e) {
+            if(e.code === "Enter") {
+                //Replaces forwardslashes with backslashes
+                folderName.value = folderName.value.replace("/", "\\");
+                getDirectory(document.getElementById("folderName").value).then(exists => {
+                    addToHistory(folderName.value);
+                }, enoent => {
+                    //When the folder does nto exist
+                    alert("This folder does not exist!!!");
+                });
+            }
         });
 
+        //Downloads all selected files
         downloadSelected.addEventListener("click",function() {
-            window.open("/?file="+selectedFiles);
+            window.open("/download?file="+selectedFiles);
         });
 
+        //Detects if the user tries to shift click files
         document.addEventListener("keydown",function(e) {
             if(e.keyCode === 16) {
                 setIsShifting(true);
             }
         });
+        //Cancels shift clicking
         document.addEventListener("keyup",function(e) {
+            //window.open("/hello");
             setIsShifting(false);
         });
-        socket.on("filesToDownload",function(data) {
-            console.log("thisthsiohodifhsodifhsodifhsodifhsodifhaosidfh");
-            window.open("/?file="+data.files);
+
+        sortButton.addEventListener("click", () => {
+            files.reverse();
+            folders.reverse();
+            sortButton.innerText = sortButton.innerText === "A-Z" ? "Z-A" :"A-Z";
+            showItems(false);
         });
+
+        //Downloads files
+        socket.on("filesToDownload",function(data) {
+            setSelectedFiles(data.files);
+            //simulateClick();
+        });
+        //Shows a file error if there is one
         socket.on("fileError",function(error) {
             alert(error);
         });
+
+        // function simulateClick() {
+        //     const event = new MouseEvent('click', {
+        //         view: window,
+        //         bubbles: true,
+        //         cancelable: true
+        //     });
+        //     downloadSelected.dispatchEvent(event);
+        // }
     }
 }
