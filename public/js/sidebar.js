@@ -2,9 +2,9 @@
 document.getElementById("hideSidebar").addEventListener("click", () => {
     const sidebar = document.getElementById("sidebar");
     //If the sidebar is visible, hides it and vice versa
-    if(!sidebar.classList.contains("hidden")) {
-        sidebar.classList.add("hidden");
+    if(!sidebar.classList.contains("w-1/12")) {
+        sidebar.classList.add("w-1/12");
     }else {
-        sidebar.classList.remove("hidden");
+        sidebar.classList.remove("w-1/12");
     }
 })

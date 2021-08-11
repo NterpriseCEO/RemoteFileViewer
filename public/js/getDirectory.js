@@ -1,22 +1,31 @@
 import { socket, isShifting, setIsShifting, selectedFiles, setSelectedFiles, lastDirectory, setLastDirectory,
-         History, addToHistory, setFiles, setFolders, files, folders, setFileIndex } from "./globals.js"
+         History, addToHistory, setFiles, setFolders, files, folders, setFileIndex, isListView, setIsListView } from "./globals.js"
 import { loadFile, showFileViewer } from "./fileViewer/loadFile.js"
 
-let folderTemplate, folderClone,
-    folderTitle, title,
-    template, clone,
-    folderName
-;
+let folderClone,
+    folderTitle, title, gridTitle, gridFolderTitle,
+    template, clone, gridClone, gridFolderClone,
+    folderName,
+    filesBox;
 
 export function init() {
+    filesBox = document.querySelector(".filesView:not(.hidden)"),
+
     template = document.getElementById("file");
     clone = template.content.querySelector(".file");
     title = clone.querySelector(".title");
+
+    gridClone = template.content.querySelector(".gridFile");
+    gridTitle = gridClone.querySelector(".title");
+
     folderName = document.getElementById("folderName");
 
-    folderTemplate = document.getElementById("folder");
-    folderClone = folderTemplate.content.querySelector(".folder");
+    folderClone = template.content.querySelector(".folder");
     folderTitle = folderClone.querySelector(".title");
+
+    gridFolderClone = template.content.querySelector(".gridFolder");
+    gridFolderTitle = gridFolderClone.querySelector(".title")
+
 }
 
 export function getDirectory(directory, fromBrowser) {
@@ -56,9 +65,12 @@ export function getDirectory(directory, fromBrowser) {
 }
 
 //Shows the files and folders on the screen
-export function showItems(notEmpty) {
-    let filesBox = document.getElementById("files"),
-        emptyFolder = document.getElementById("emptyFolder");
+export function showItems(notEmpty, filter) {
+    let emptyFolder = document.getElementById("emptyFolder");
+
+    filesBox = document.querySelector(".filesView:not(.hidden)"),
+    console.log(filesBox);
+
     //Removes all files and folders from the screen
     document.querySelectorAll('.file, .folder').forEach(e => e.remove());
 
@@ -68,23 +80,52 @@ export function showItems(notEmpty) {
     //Loops through the files and folders and shows them on screen
     if(!notEmpty) {
         emptyFolder.classList.add("hidden");
-        folders.forEach(function(item) {
-            folderTitle.innerText = item;
-            let elm = folderClone.cloneNode(true);
-            filesBox.append(elm);
-            clickFolder(elm);
-        });
+        if(filter) {
+            //shows only the neccesary files and folders based on the searchbar value
+            folders.filter(folder => {
+                if(folder.indexOf(filter) > -1) {
+                    addFolder(folder);
+                }
+            });
+            files.filter(file => {
+                console.log(file.indexOf(filter) > -1, filter, file);
+                if(file.indexOf(filter) > -1) {
+                    addItem(file);
+                }
+            });
+        }else {
+            //Shows all files
+            folders.forEach(function(item) {
+                addFolder(item);
+            });
 
-        files.forEach(function(item) {
-            title.innerText = item;
-            let elm = clone.cloneNode(true);
-            filesBox.append(elm);
-            clickFile(elm);
-        });
+            files.forEach(function(item) {
+                addFile(item);
+            });
+        }
     }else {
         //Shows the empty folder indicator
         emptyFolder.classList.remove("hidden");
     }
+}
+
+function addFile(name) {
+    const file = (isListView ? title : gridTitle);
+    file.innerText = name;
+    file.setAttribute("title", name);
+    let elm = isListView ? clone.cloneNode(true) : gridClone.cloneNode(true);
+
+    filesBox.append(elm);
+    clickFile(elm);
+}
+
+function addFolder(name) {
+    const folder = (isListView ? folderTitle : gridFolderTitle);
+    folder.innerText = name;
+    folder.setAttribute("title", name)
+    let elm = isListView ? folderClone.cloneNode(true) : gridFolderClone.cloneNode(true);
+    filesBox.append(elm);
+    clickFolder(elm);
 }
 
 //When double clicking on a folder, displays the content of this folder

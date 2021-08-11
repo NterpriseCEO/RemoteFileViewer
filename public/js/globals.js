@@ -7,7 +7,8 @@ let socket = io(window.location.href.split("/")[2]),
 
 let files,
     folders,
-    fileIndex = 0;
+    fileIndex = 0,
+    isListView = true;
 
 export function setSelectedFiles(value) {
     selectedFiles = value;
@@ -61,6 +62,10 @@ export function setFileIndex(value) {
     fileIndex = value;
 }
 
+export function setIsListView(value) {
+    isListView = value;
+}
+
 
 export {
     socket,
@@ -71,5 +76,6 @@ export {
     historyPos,
     files,
     folders,
-    fileIndex
+    fileIndex,
+    isListView
 }

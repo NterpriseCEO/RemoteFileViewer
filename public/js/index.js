@@ -1,5 +1,5 @@
 import { socket, isShifting, setIsShifting, selectedFiles, setSelectedFiles, lastDirectory, setLastDirectory, History, addToHistory,
-         historyPos, setHistoryPos, files, folders} from "./globals.js"
+         historyPos, setHistoryPos, files, folders, isListView, setIsListView } from "./globals.js"
 import { getDirectory, init, showItems } from "./getDirectory.js"
 import "./fileViewer/fileViewer.js"
 import "./sidebar.js";
@@ -8,7 +8,17 @@ let downloadSelected,
     folderName,
     backButton,
     forwardsButton,
-    sortButton;
+    sortButton,
+    searchBar,
+    clearSearch,
+    sortAscending,
+    sortDescending,
+    ascending = true,
+    changeLayoutButton,
+    listViewIcon,
+    gridViewIcon,
+    listView,
+    gridView;
 
 document.onreadystatechange = async function() {
     if (document.readyState == "complete") {
@@ -20,13 +30,27 @@ document.onreadystatechange = async function() {
         backButton = document.getElementById("historyBack");
         forwardsButton = document.getElementById("historyForwards");
 
-        //The button for sorting A-Z and Z-A
-        sortButton = document.getElementById("sortItems");
 
         //The download button for downloading all selected files
         downloadSelected = document.getElementById("downloadSelected");
         //The input that shows the folder path
         folderName = document.getElementById("folderName");
+
+        searchBar = document.getElementById("search");
+
+        clearSearch = document.getElementById("clearSearch");
+
+        //The button and icons for sorting A-Z and Z-A
+        sortButton = document.getElementById("sortItems");
+        sortAscending = document.getElementById("sortAscending");
+        sortDescending = document.getElementById("sortDescending");
+
+        //The buttons and icons for changing the screen layout
+        changeLayoutButton = document.getElementById("changeLayout");
+        listViewIcon = document.getElementById("listViewIcon");
+        gridViewIcon = document.getElementById("gridViewIcon");
+        listView = document.getElementById("listView");
+        gridView = document.getElementById("gridView");
 
         //Initialised everything
         init();
@@ -132,6 +156,17 @@ document.onreadystatechange = async function() {
             }
         });
 
+        searchBar.addEventListener("keyup", function(e) {
+            //Filters the files and folders based on the search value
+            showItems(false, searchBar.value);
+        });
+
+        clearSearch.addEventListener("click", () => {
+            //Clears the search bar and shows all files and folders
+            searchBar.value = "";
+            showItems(false);
+        })
+
         //Downloads all selected files
         downloadSelected.addEventListener("click",function() {
             window.open("/download?file="+selectedFiles);
@@ -150,9 +185,43 @@ document.onreadystatechange = async function() {
         });
 
         sortButton.addEventListener("click", () => {
+            //Reverses the order fo the files and folders
+            //and reverses the order of the text in the sorting button
+            ascending = !ascending;
+
+            if(ascending) {
+                sortAscending.classList.remove("hidden");
+                sortDescending.classList.add("hidden");
+                sortButton.setAttribute("title", "Sort files and folders descending");
+            }else {
+                sortAscending.classList.add("hidden");
+                sortDescending.classList.remove("hidden");
+                sortButton.setAttribute("title", "Sort files and folders asscending");
+            }
+
             files.reverse();
             folders.reverse();
-            sortButton.innerText = sortButton.innerText === "A-Z" ? "Z-A" :"A-Z";
+
+            showItems(false);
+        });
+
+        changeLayoutButton.addEventListener("click", () => {
+            setIsListView(!isListView);
+            //Changes the layout of the folder from list view to grid view
+            //and vice versa
+            if(isListView) {
+                listViewIcon.classList.remove("hidden");
+                gridViewIcon.classList.add("hidden");
+                listView.classList.remove("hidden");
+                gridView.classList.add("hidden");
+                changeLayoutButton.setAttribute("title", "Toggle grid view");
+            }else {
+                listViewIcon.classList.add("hidden");
+                gridViewIcon.classList.remove("hidden");
+                listView.classList.add("hidden");
+                gridView.classList.remove("hidden");
+                changeLayoutButton.setAttribute("title", "Toggle list view");
+            }
             showItems(false);
         });
 
