@@ -8,7 +8,10 @@ let socket = io(window.location.href.split("/")[2]),
 let files,
     folders,
     fileIndex = 0,
-    isListView = true;
+    listViewStored = JSON.parse(localStorage.getItem("isListView")),
+    isListView = listViewStored !== null ? listViewStored : true;
+
+console.log(listViewStored);
 
 export function setSelectedFiles(value) {
     selectedFiles = value;

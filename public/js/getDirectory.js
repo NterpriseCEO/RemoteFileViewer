@@ -29,36 +29,47 @@ export function init() {
 
     changeSizeSelect = document.getElementById("changeIconSize");
 
+    const iconSize = localStorage.getItem("iconSize");
+
+    if(iconSize !== null) {
+        setIconSize(iconSize);
+    }
+
     changeSizeSelect.addEventListener("change", () => {
-        let cloneSvg = clone.querySelector("svg").classList,
-            gridCloneSvg = gridClone.querySelector("svg").classList,
-            folderCloneSvg = folderClone.querySelector("svg").classList,
-            gridFolderCloneSvg = gridFolderClone.querySelector("svg").classList;
-        cloneSvg.remove("h-10");
-        cloneSvg.remove("h-16");
-        cloneSvg.remove("h-24");
-        cloneSvg.remove("h-48");
-        cloneSvg.add(changeSizeSelect.value);
-
-        gridCloneSvg.remove("h-10");
-        gridCloneSvg.remove("h-16");
-        gridCloneSvg.remove("h-24");
-        gridCloneSvg.remove("h-48");
-        gridCloneSvg.add(changeSizeSelect.value);
-
-        folderCloneSvg.remove("h-10");
-        folderCloneSvg.remove("h-16");
-        folderCloneSvg.remove("h-24");
-        folderCloneSvg.remove("h-48");
-        folderCloneSvg.add(changeSizeSelect.value);
-
-        gridFolderCloneSvg.remove("h-10");
-        gridFolderCloneSvg.remove("h-16");
-        gridFolderCloneSvg.remove("h-24");
-        gridFolderCloneSvg.remove("h-48");
-        gridFolderCloneSvg.add(changeSizeSelect.value);
+        setIconSize(changeSizeSelect.value);
+        localStorage.setItem("iconSize", changeSizeSelect.value);
         showItems(false);
     });
+}
+
+function setIconSize(value) {
+    let cloneSvg = clone.querySelector("svg").classList,
+        gridCloneSvg = gridClone.querySelector("svg").classList,
+        folderCloneSvg = folderClone.querySelector("svg").classList,
+        gridFolderCloneSvg = gridFolderClone.querySelector("svg").classList;
+    cloneSvg.remove("h-10");
+    cloneSvg.remove("h-16");
+    cloneSvg.remove("h-24");
+    cloneSvg.remove("h-48");
+    cloneSvg.add(value);
+
+    gridCloneSvg.remove("h-10");
+    gridCloneSvg.remove("h-16");
+    gridCloneSvg.remove("h-24");
+    gridCloneSvg.remove("h-48");
+    gridCloneSvg.add(value);
+
+    folderCloneSvg.remove("h-10");
+    folderCloneSvg.remove("h-16");
+    folderCloneSvg.remove("h-24");
+    folderCloneSvg.remove("h-48");
+    folderCloneSvg.add(value);
+
+    gridFolderCloneSvg.remove("h-10");
+    gridFolderCloneSvg.remove("h-16");
+    gridFolderCloneSvg.remove("h-24");
+    gridFolderCloneSvg.remove("h-48");
+    gridFolderCloneSvg.add(value);
 }
 
 export function getDirectory(directory, fromBrowser) {
@@ -123,7 +134,7 @@ export function showItems(notEmpty, filter) {
             files.filter(file => {
                 console.log(file.indexOf(filter) > -1, filter, file);
                 if(file.indexOf(filter) > -1) {
-                    addItem(file);
+                    addFile(file);
                 }
             });
         }else {

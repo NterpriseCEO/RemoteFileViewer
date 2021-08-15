@@ -53,6 +53,13 @@ document.onreadystatechange = async function() {
         listView = document.getElementById("listView");
         gridView = document.getElementById("gridView");
 
+        if(!isListView) {
+            listViewIcon.classList.add("hidden");
+            gridViewIcon.classList.remove("hidden");
+            listView.classList.add("hidden");
+            gridView.classList.remove("hidden");
+        }
+
         //Initialised everything
         init();
 
@@ -210,6 +217,9 @@ document.onreadystatechange = async function() {
             setIsListView(!isListView);
             //Changes the layout of the folder from list view to grid view
             //and vice versa
+
+            localStorage.setItem("isListView", isListView);
+
             if(isListView) {
                 listViewIcon.classList.remove("hidden");
                 gridViewIcon.classList.add("hidden");
