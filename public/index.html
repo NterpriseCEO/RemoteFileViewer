@@ -21,7 +21,7 @@
     <body class = "bg-gray-800 select-none">
         <template id = "file">
             <div class = "file flex items-center p-5 hover:bg-gray-900 hover:shadow-xl cursor-pointer">
-                <svg class = "flex-none h-10 text-red-500 shadow-xl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class = "h-10 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span class = "title px-5 text-gray-400 flex-grow max-w-md break-all"></span>
@@ -38,7 +38,7 @@
                 </button>
             </div>
             <div class = "folder flex items-center p-5 hover:bg-gray-900 hover:shadow-xl cursor-pointer">
-                <svg class = "w-10 text-yellow-500 shadow-xl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class = "h-10 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
                 <!-- <img src = "/images/folder.png" class = "w-12" alt = "An image file"> -->
@@ -46,7 +46,7 @@
             </div>
 
             <div class = "file gridFile flex items-center flex-col p-2 text-center hover:bg-gray-900 hover:shadow-xl cursor-pointer">
-                <svg class = "flex-none h-10 text-red-500 shadow-xl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class = "h-10 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span class = "title px-5 text-gray-400 break-all"></span>
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class = "folder gridFolder flex items-center flex-col p-5 text-center hover:bg-gray-900 hover:shadow-xl cursor-pointer">
-                <svg class = "w-10 text-yellow-500 shadow-xl" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class = "h-10 text-yellow-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
                 <!-- <img src = "/images/folder.png" class = "w-12" alt = "An image file"> -->
@@ -115,11 +115,12 @@
                             <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                         </svg>
                     </button>
-                    <select class = "bg-green-500 px-5 text-white shadow-md pointer hover:shadow-xl hover:bg-green-600">
+                    <select id = "changeIconSize" class = "bg-green-500 px-5 text-white shadow-md pointer hover:shadow-xl hover:bg-green-600">
                         <option selected disabled>Icon Size</option>
-                        <option value = "small">Small</option>
-                        <option value = "medium">Medium</option>
-                        <option value = "large">Large</option>
+                        <option value = "h-10">Small</option>
+                        <option value = "h-16">Medium</option>
+                        <option value = "h-24">Large</option>
+                        <option value = "h-48">American Size Small</option>
                     </select>
                     <span class = "text-white flex flex-col justify-center items-center relative -right-7">
                         <span class = "align-middle">C:\</span>

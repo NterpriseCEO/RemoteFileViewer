@@ -18,7 +18,8 @@ let downloadSelected,
     listViewIcon,
     gridViewIcon,
     listView,
-    gridView;
+    gridView,
+    changeSizeSelect;
 
 document.onreadystatechange = async function() {
     if (document.readyState == "complete") {

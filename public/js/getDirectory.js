@@ -6,7 +6,8 @@ let folderClone,
     folderTitle, title, gridTitle, gridFolderTitle,
     template, clone, gridClone, gridFolderClone,
     folderName,
-    filesBox;
+    filesBox,
+    changeSizeSelect;
 
 export function init() {
     filesBox = document.querySelector(".filesView:not(.hidden)"),
@@ -24,8 +25,40 @@ export function init() {
     folderTitle = folderClone.querySelector(".title");
 
     gridFolderClone = template.content.querySelector(".gridFolder");
-    gridFolderTitle = gridFolderClone.querySelector(".title")
+    gridFolderTitle = gridFolderClone.querySelector(".title");
 
+    changeSizeSelect = document.getElementById("changeIconSize");
+
+    changeSizeSelect.addEventListener("change", () => {
+        let cloneSvg = clone.querySelector("svg").classList,
+            gridCloneSvg = gridClone.querySelector("svg").classList,
+            folderCloneSvg = folderClone.querySelector("svg").classList,
+            gridFolderCloneSvg = gridFolderClone.querySelector("svg").classList;
+        cloneSvg.remove("h-10");
+        cloneSvg.remove("h-16");
+        cloneSvg.remove("h-24");
+        cloneSvg.remove("h-48");
+        cloneSvg.add(changeSizeSelect.value);
+
+        gridCloneSvg.remove("h-10");
+        gridCloneSvg.remove("h-16");
+        gridCloneSvg.remove("h-24");
+        gridCloneSvg.remove("h-48");
+        gridCloneSvg.add(changeSizeSelect.value);
+
+        folderCloneSvg.remove("h-10");
+        folderCloneSvg.remove("h-16");
+        folderCloneSvg.remove("h-24");
+        folderCloneSvg.remove("h-48");
+        folderCloneSvg.add(changeSizeSelect.value);
+
+        gridFolderCloneSvg.remove("h-10");
+        gridFolderCloneSvg.remove("h-16");
+        gridFolderCloneSvg.remove("h-24");
+        gridFolderCloneSvg.remove("h-48");
+        gridFolderCloneSvg.add(changeSizeSelect.value);
+        showItems(false);
+    });
 }
 
 export function getDirectory(directory, fromBrowser) {
@@ -113,7 +146,7 @@ function addFile(name) {
     const file = (isListView ? title : gridTitle);
     file.innerText = name;
     file.setAttribute("title", name);
-    let elm = isListView ? clone.cloneNode(true) : gridClone.cloneNode(true);
+    let elm = (isListView ? clone : gridClone).cloneNode(true);
 
     filesBox.append(elm);
     clickFile(elm);
@@ -123,7 +156,7 @@ function addFolder(name) {
     const folder = (isListView ? folderTitle : gridFolderTitle);
     folder.innerText = name;
     folder.setAttribute("title", name)
-    let elm = isListView ? folderClone.cloneNode(true) : gridFolderClone.cloneNode(true);
+    let elm = (isListView ? folderClone : gridFolderClone).cloneNode(true);
     filesBox.append(elm);
     clickFolder(elm);
 }
